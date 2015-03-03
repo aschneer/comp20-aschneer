@@ -25,12 +25,6 @@ function init()
 	var mspac_x_rel = 37;
 	var mspac_y_rel = 31;
 
-	h = parseInt(canvas.getAttribute("height"));
-	w = parseInt(canvas.getAttribute("width"));
-
-	ctx.fillStyle = "gray";
-	ctx.fillRect(0,0,w,h);
-
 	// Function expression stored to a variable.
 	// This function is invoked when the
 	// "onload" field is called within
