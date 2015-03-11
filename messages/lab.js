@@ -3,7 +3,6 @@
 // its ready-state.
 function callback()
 {
-	console.log("In my calback function " + xmlhttp.readystate);
 	// If request finished and response ready,
 	// and HTML status code is "OKAY"...
 	if((xmlhttp.readyState == 4) && (xmlhttp.status == 200))
