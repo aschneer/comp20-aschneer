@@ -8,10 +8,19 @@ function callback()
 	// and HTML status code is "OKAY"...
 	if((xmlhttp.readyState == 4) && (xmlhttp.status == 200))
 	{
-		// Receive the response data from
-		// the XMLHttpRequest object and
-		// update the page with it.
-		receiveData = JSON
+		// Receive the JSON "string"
+		// (data object) from
+		// the XMLHttpRequest object.
+		var receiveData = JSON.parse(xmlhttp.responseText);
+		// Get div element where data should go.
+		var contentDiv = document.getElementById("messages");
+		// Parse data into components and display.
+		var displayData = "";
+		for (i = 0; i < receiveData.length; i++)
+		{
+			displayData += "<p>" + receiveData[i]['username'] + " - " + receiveData[i]["content"] + "</p>";
+		}
+		contentDiv.innerHTML = displayData;
 	}
 }
 
@@ -20,9 +29,11 @@ function callback()
 function parse()
 {
 	// Create XMLHttpRequest object.
+	// Exclude "var" so the object is global.
 	xmlhttp = new XMLHttpRequest();
 	// Define the type of request to
-	// send to the "server".
+	// send to the "server"; use
+	// asynchronous request.
 	xmlhttp.open("GET","./data.json",true);
 	// Define function to run when the
 	// ready-state of the XMLHttpRequest
@@ -31,41 +42,4 @@ function parse()
 	// Send the request defined in "open()"
 	// to the XMLHttpRequest object server.
 	xmlhttp.send();
-
-	try
-	{
-		// Run some code here, which may or may
-		// not work.
-
-		// This statement will "throw" the error
-		// to be caught in the error handler.
-		// Catch only runs if an exception
-		// is thrown.
-		if(ERRORCONDITION)
-		{
-			throw ERRORVALUE
-		}
-	}
-	// Use "error" here; it's a keyword.
-	catch(error)
-	{
-		// Handle errors here.
-		// Catch and suppress errors.
-
-		// The value of the "throw"
-		// is "caught" here and stored
-		// in the "error" argument.
-
-		// "error" can also be an object
-		// of which the member "message"
-		// contains the error message.
-	}
-	finally
-	{
-		// Code here will ALWAYS be executed
-		// regardless of whether or not an error
-		// occurred.
-	}
-	contentDiv = document.getElementById("messages");
-
 }
