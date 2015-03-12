@@ -12,27 +12,27 @@ var mapOptions = {
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 };
 var map;
-// Object for my position marker.
+// Object for user's position marker.
 var myMarker;
-// Array to store the data for the class.
-// This will be an array of objects
-// containing lat/lng position and
-// login name.
-var classData = [];
-// Array to contain objects with
-// markers and information for the
-// positions of the rest of the class.
+// Object for user's info window.
+var myInfoWindow;
+// Object for user's click event listener.
+var myMarkerClickListener;
+// Array to store the markers
+// for the class.
 var classMarkers = [];
-/*
-var classMarkerOptions = [];
-var classMarkers = [];
-var classMarkerClickListeners = [];
 var classInfoWindows = [];
-*/
-// Class position data.
-var parsedData;
+var classMarkerClickListeners = [];
 
-
+// Function to generate click event
+// listener for a classmate's marker.
+function addClassClickListener(index)
+{
+	// Add click event listener for info window.
+	classMarkerClickListeners[index] = google.maps.event.addListener(classMarkers[index],"click",function(){
+			classInfoWindows[index].open(map,classMarkers[index]);
+	});
+}
 
 // Function to execute when the
 // XMLHttpRequest server (AJAX)
@@ -42,45 +42,11 @@ function ajaxCallback()
 	// Check if data was received.
 	if((ajaxObj.readyState == 4) && (ajaxObj.status == 200))
 	{
-		console.log("Got Data:");
 		// Parse data from JSON file.
-		parsedData = JSON.parse(ajaxObj.responseText);
-		console.log(parsedData);
-		for(var i = 0; i < parsedData.length; i++)
-		{
-			// Create LatLng object for current
-			// classmate's position.
-			var currDataLoc = new google.maps.LatLng(parsedData[i].lat,parsedData[i].lng);
-			// Generate marker options for
-			// current classmate.
-			classMarkerOptions[i] = {
-					map: map,
-					title: parsedData[i].login,
-					position: currDataLoc,
-					visible: true,
-					icon: "../assets/rickles_noBack_small.png"
-			};
-			// Create a marker for the current classmate.
-			classMarkers[i] = new google.maps.Marker(classMarkerOptions[i]);
-			// Create a marker info bubble for the current classmate.
-			classInfoWindows[i] = new google.maps.InfoWindow({
-					content: classMarkers[i].getTitle()
-			});
-			// Create callback function for the current classmate.
-			/*classCallbacks[i] = function(){
-
-			};*/
-
-			console.log(parsedData.length);
-
-			// Open the info window.
-			classInfoWindows[i].open(map,classMarkers[i]);
-			// Add click event listener for info window.
-			classMarkerClickListeners[i] = google.maps.event.addListener(classMarkers[i],"click",function(){
-					console.log(i);
-					classInfoWindows[i].open(map,classMarkers[i]);
-			});
-		}
+		var parsedData = JSON.parse(ajaxObj.responseText);
+		// Call function to add markers for
+		// the rest of the class.
+		addClassMarkers(parsedData);
 	}
 }
 
@@ -104,25 +70,21 @@ function addUserMarker(LatLngObj)
 	// with the marker object.
 	myMarker = new google.maps.Marker(markerOptions);
 	// Create an info window
-	// for my marker.
+	// for user's marker and update
+	// global "myInfoWindow" variable.
 	myInfoWindow = new google.maps.InfoWindow({
 		content: myMarker.getTitle()
 	});
+	// Open the user's info window
+	// by default.
+	myInfoWindow.open(map,myMarker);
 	// Add a click event listener
 	// for the user's marker.
-	ADDEVENTLISTENER
-
-
-			myInfoWindow = new google.maps.InfoWindow({
-					content: myMarker.getTitle()
-			});
-			// Open the info window.
-			myInfoWindow.open(map,myMarker);
-			// Add click event listener for info window.
-			myMarkerClickListener = google.maps.event.addListener(myMarker,"click",function(){
-					infoWindow.open(map,myMarker);
-
-
+	myMarkerClickListener = google.maps.event.addListener(myMarker,"click",function(){
+		myInfoWindow.open(map,myMarker);		
+	});
+	// Center the map on the user's marker.
+	map.setCenter(myMarker.getPosition());
 }
 
 // Function to add classmate's marker
@@ -130,15 +92,41 @@ function addUserMarker(LatLngObj)
 // lat/lng location.  The
 // argument is an object with
 // fields "lat" and "lng".
-function addClassMarker(LatLngObj)
+function addClassMarkers(classDataArray)
 {
-
+	for(var i = 0; i < classDataArray.length; i++)
+	{
+		// Create LatLng object for current
+		// classmate's position.
+		var currDataLoc = new google.maps.LatLng(classDataArray[i].lat,classDataArray[i].lng);
+		// Generate marker options for
+		// current classmate.
+		var markerOptions = {
+				map: map,
+				title: classDataArray[i].login,
+				position: currDataLoc,
+				visible: true,
+				icon: "../assets/rickles_noBack_small.png"
+		};
+		// Create a marker for the current classmate.
+		classMarkers[i] = new google.maps.Marker(markerOptions);
+		// Create a marker info bubble for the current classmate.
+		classInfoWindows[i] = new google.maps.InfoWindow({
+				content: classMarkers[i].getTitle()
+				//--ADD DISTANCE FROM ME--
+		});
+		// Open the info window by default.
+		classInfoWindows[i].open(map,classMarkers[i]);
+		// Call function to add click event listener
+		// for each classmate's marker.
+		addClassClickListener(i);
+	}
 }
 
-// Grab the user's current GPS location
-// and return it as an object containing
-// two fields: "lat", and "lng".
-function getMyLocation()
+// Grab the user's current GPS location.
+// Call a function to add a marker at
+// the user's current location.
+function addUserToMap()
 {
 	var currentLatLng;
 	// Get user's location.
@@ -164,17 +152,32 @@ function getMyLocation()
 	}
 }
 
+// Grab the class' data.
+// Call a function to add markers at
+// the class' current locations.
+function addClassToMap()
+{
+	// Load JSON data of the rest
+	// of the class, send my location
+	// and username.
+	ajaxObj.open("POST","https://secret-about-box.herokuapp.com/sendLocation",true);
+	ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	ajaxObj.onreadystatechange = ajaxCallback;
+	ajaxObj.send("login="+myInfo.login+"&lat="+myInfo.lat+"&lng="+myInfo.lng);
+}
+
 // This function runs when HTML body loads.
 function init()
 {
 	// Create the map object.  This is global.
 	map = new google.maps.Map(document.getElementById('map-canvas'),
 		  mapOptions);
-	// These will not necessarily
-	// execute in order or finish
-	// at the same time.
-	getMyLocation();
-	getClassLocations();
+	// Add user markers to
+	// the map.
+	addUserMarker();
+	// Add class markers to
+	// the map.
+	addClassToMap();
 }
 
 
