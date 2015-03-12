@@ -19,10 +19,10 @@ var myInfoWindow;
 // Arrays to hold position marker
 // information for the rest of
 // the class.
-var classMarkerOptions;
-var classMarkers;
-var classMarkerClickListeners;
-var classInfoWindows;
+var classMarkerOptions = [];
+var classMarkers = [];
+var classMarkerClickListeners = [];
+var classInfoWindows = [];
 // Class position data.
 var parsedData;
 
@@ -36,9 +36,11 @@ function ajaxCallback()
 	// Check if data was received.
 	if((ajaxObj.readyState == 4) && (ajaxObj.status == 200))
 	{
+		console.log("Got Data:");
 		// Parse data from JSON file.
 		parsedData = JSON.parse(ajaxObj.responseText);
-		for(i = 0; i < parsedData.length; i++)
+		console.log(parsedData);
+		for(var i = 0; i < parsedData.length; i++)
 		{
 			// Create LatLng object for current
 			// classmate's position.
@@ -51,19 +53,27 @@ function ajaxCallback()
 					position: currDataLoc,
 					visible: true,
 					icon: "../assets/rickles_noBack_small.png"
-				};
+			};
 			// Create a marker for the current classmate.
 			classMarkers[i] = new google.maps.Marker(classMarkerOptions[i]);
 			// Create a marker info bubble for the current classmate.
 			classInfoWindows[i] = new google.maps.InfoWindow({
 					content: classMarkers[i].getTitle()
-				});
+			});
+			// Create callback function for the current classmate.
+			/*classCallbacks[i] = function(){
+
+			};*/
+
+			console.log(parsedData.length);
+
 			// Open the info window.
 			classInfoWindows[i].open(map,classMarkers[i]);
 			// Add click event listener for info window.
-			classMarkerClickListeners = google.maps.event.addListener(classMarkers[i],"click",function(){
+			classMarkerClickListeners[i] = google.maps.event.addListener(classMarkers[i],"click",function(){
+					console.log(i);
 					classInfoWindows[i].open(map,classMarkers[i]);
-				});
+			});
 		}
 	}
 }
@@ -98,17 +108,17 @@ function init()
 					position: currLoc,
 					visible: true,
 					icon: "../assets/rickles_noBack_small.png"
-				};
+			};
 			myMarker = new google.maps.Marker(myMarkerOptions);
 			myInfoWindow = new google.maps.InfoWindow({
 					content: myMarker.getTitle()
-				});
+			});
 			// Open the info window.
 			myInfoWindow.open(map,myMarker);
 			// Add click event listener for info window.
 			myMarkerClickListener = google.maps.event.addListener(myMarker,"click",function(){
 					infoWindow.open(map,myMarker);
-				});
+			});
 			// Load JSON data of the rest
 			// of the class, send my location
 			// and username.
