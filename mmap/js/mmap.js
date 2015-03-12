@@ -1,28 +1,34 @@
 // Global Variables:
-var myLogin = "KelleyAmmerman";
-var myLat = 0;
-var myLng = 0;
+var myInfo = {
+	login: "KelleyAmmerman",
+	lat: 0,
+	lng: 0,
+};
 var ajaxObj = new XMLHttpRequest();
-var myLatLng = new google.maps.LatLng(myLat,myLng);
 // Array containing initial options for the map.
 var mapOptions = {
 		zoom: 8,
-		center: myLatLng,
+		center: new google.maps.LatLng(myInfo.lat,myInfo.lng),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-	};
+};
 var map;
-// Variables for my position marker.
-var myMarkerOptions;
+// Object for my position marker.
 var myMarker;
-var myMarkerClickListener;
-var myInfoWindow;
-// Arrays to hold position marker
-// information for the rest of
-// the class.
+// Array to store the data for the class.
+// This will be an array of objects
+// containing lat/lng position and
+// login name.
+var classData = [];
+// Array to contain objects with
+// markers and information for the
+// positions of the rest of the class.
+var classMarkers = [];
+/*
 var classMarkerOptions = [];
 var classMarkers = [];
 var classMarkerClickListeners = [];
 var classInfoWindows = [];
+*/
 // Class position data.
 var parsedData;
 
@@ -78,7 +84,85 @@ function ajaxCallback()
 	}
 }
 
+// Function to add marker
+// to the map at a particular
+// lat/lng location.  The
+// argument is an object with
+// fields "lat" and "lng".
+function addUserMarker(LatLngObj)
+{
+	// Define options for my marker.
+	var markerOptions = {
+		map: map,
+		title: myInfo.login,
+		position: new google.maps.LatLng(LatLngObj.lat,LatLngObj.lng),
+		visible: true,
+		icon: "../assets/rickles_noBack_small.png"
+	};
+	// Create user's marker object and
+	// update global "myMarker"
+	// with the marker object.
+	myMarker = new google.maps.Marker(markerOptions);
+	// Create an info window
+	// for my marker.
+	myInfoWindow = new google.maps.InfoWindow({
+		content: myMarker.getTitle()
+	});
+	// Add a click event listener
+	// for the user's marker.
+	ADDEVENTLISTENER
 
+
+			myInfoWindow = new google.maps.InfoWindow({
+					content: myMarker.getTitle()
+			});
+			// Open the info window.
+			myInfoWindow.open(map,myMarker);
+			// Add click event listener for info window.
+			myMarkerClickListener = google.maps.event.addListener(myMarker,"click",function(){
+					infoWindow.open(map,myMarker);
+
+
+}
+
+// Function to add classmate's marker
+// to the map at a particular
+// lat/lng location.  The
+// argument is an object with
+// fields "lat" and "lng".
+function addClassMarker(LatLngObj)
+{
+
+}
+
+// Grab the user's current GPS location
+// and return it as an object containing
+// two fields: "lat", and "lng".
+function getMyLocation()
+{
+	var currentLatLng;
+	// Get user's location.
+	if(navigator.geolocation)
+	{
+		// Geolocation available.
+		// Get current position.
+		navigator.geolocation.getCurrentPosition(function(posObj){
+			var currentLat = posObj.coords.latitude;
+			var currentLng = posObj.coords.longitude;
+			currentLatLng = {lat:currentLat,lng:currentLng};
+			// Update "myInfo" object.
+			myInfo.lat = currentLat;
+			myInfo.lng = currentLng;
+			// Call function to place a marker
+			// at the user's current position.
+			addUserMarker(currentLatLng);
+		});
+	}
+	else
+	{
+		// Geolocation not available.
+	}
+}
 
 // This function runs when HTML body loads.
 function init()
@@ -86,15 +170,18 @@ function init()
 	// Create the map object.  This is global.
 	map = new google.maps.Map(document.getElementById('map-canvas'),
 		  mapOptions);
+	// These will not necessarily
+	// execute in order or finish
+	// at the same time.
+	getMyLocation();
+	getClassLocations();
+}
 
-	// Get user's location.
-	if(navigator.geolocation)
-	{
-		// Geolocation available.
-		// Get current position.
-		navigator.geolocation.getCurrentPosition(function(posObj){
-			myLat = posObj.coords.latitude;
-			myLng = posObj.coords.longitude;
+
+
+/*
+			var lat = posObj.coords.latitude;
+			var lng = posObj.coords.longitude;
 			// Center the map on my current location.
 			var currLoc = new google.maps.LatLng(myLat,myLng);
 			map.setCenter(currLoc);
@@ -126,10 +213,5 @@ function init()
 			ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 			ajaxObj.onreadystatechange = ajaxCallback;
 			ajaxObj.send("login="+myLogin+"&lat="+myLat+"&lng="+myLng);
-		});
-	}
-	else
-	{
-		// Geolocation not available.
-	}	
-}
+
+*/
