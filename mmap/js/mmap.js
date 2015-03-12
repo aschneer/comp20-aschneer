@@ -26,12 +26,21 @@ var classMarkerClickListeners = [];
 
 // Function to generate click event
 // listener for a classmate's marker.
-function addClassClickListener(index)
+function addClassClickListener(index,end)
 {
 	// Add click event listener for info window.
 	classMarkerClickListeners[index] = google.maps.event.addListener(classMarkers[index],"click",function(){
 			classInfoWindows[index].open(map,classMarkers[index]);
 	});
+	if(index == end)
+	{
+		// Create Google Maps LatLng object for
+		// user's current position.
+		var currentLatLng = new google.maps.LatLng(myInfo.lat,myInfo.lng);
+		// Call function to place a marker
+		// at the user's current position.
+		addUserMarker(currentLatLng);
+	}
 }
 
 // Function to execute when the
@@ -53,15 +62,15 @@ function ajaxCallback()
 // Function to add marker
 // to the map at a particular
 // lat/lng location.  The
-// argument is an object with
-// fields "lat" and "lng".
+// argument is a Google Maps
+// LatLng object.
 function addUserMarker(LatLngObj)
 {
 	// Define options for my marker.
 	var markerOptions = {
 		map: map,
 		title: myInfo.login,
-		position: new google.maps.LatLng(LatLngObj.lat,LatLngObj.lng),
+		position: LatLngObj,
 		visible: true,
 		icon: "../assets/rickles_noBack_small.png"
 	};
@@ -84,7 +93,11 @@ function addUserMarker(LatLngObj)
 		myInfoWindow.open(map,myMarker);		
 	});
 	// Center the map on the user's marker.
+	console.log(myMarker.getPosition());
+	console.log(map.getCenter());
 	map.setCenter(myMarker.getPosition());
+	console.log(map.getCenter());
+	map.panTo(map.getCenter());
 }
 
 // Function to add classmate's marker
@@ -94,6 +107,8 @@ function addUserMarker(LatLngObj)
 // fields "lat" and "lng".
 function addClassMarkers(classDataArray)
 {
+	// Loop through class data and create
+	// markers and info windows.
 	for(var i = 0; i < classDataArray.length; i++)
 	{
 		// Create LatLng object for current
@@ -119,31 +134,27 @@ function addClassMarkers(classDataArray)
 		classInfoWindows[i].open(map,classMarkers[i]);
 		// Call function to add click event listener
 		// for each classmate's marker.
-		addClassClickListener(i);
+		addClassClickListener(i,(classDataArray.length-1));
 	}
 }
 
 // Grab the user's current GPS location.
 // Call a function to add a marker at
 // the user's current location.
-function addUserToMap()
+function getUserLocation()
 {
-	var currentLatLng;
 	// Get user's location.
 	if(navigator.geolocation)
 	{
 		// Geolocation available.
 		// Get current position.
 		navigator.geolocation.getCurrentPosition(function(posObj){
-			var currentLat = posObj.coords.latitude;
-			var currentLng = posObj.coords.longitude;
-			currentLatLng = {lat:currentLat,lng:currentLng};
 			// Update "myInfo" object.
-			myInfo.lat = currentLat;
-			myInfo.lng = currentLng;
-			// Call function to place a marker
-			// at the user's current position.
-			addUserMarker(currentLatLng);
+			myInfo.lat = posObj.coords.latitude;
+			myInfo.lng = posObj.coords.longitude;
+			// Add class markers to
+			// the map.
+			addClassToMap();
 		});
 	}
 	else
@@ -172,49 +183,7 @@ function init()
 	// Create the map object.  This is global.
 	map = new google.maps.Map(document.getElementById('map-canvas'),
 		  mapOptions);
-	// Add user markers to
-	// the map.
-	addUserMarker();
-	// Add class markers to
-	// the map.
-	addClassToMap();
+	// Get location of user
+	// first.
+	getUserLocation();
 }
-
-
-
-/*
-			var lat = posObj.coords.latitude;
-			var lng = posObj.coords.longitude;
-			// Center the map on my current location.
-			var currLoc = new google.maps.LatLng(myLat,myLng);
-			map.setCenter(currLoc);
-			// Create a marker at my current location.
-			// Add an info window to display my imaginary
-			// username.
-			myMarkerOptions = {
-					map: map,
-					// My imaginary username.
-					title: myLogin,
-					position: currLoc,
-					visible: true,
-					icon: "../assets/rickles_noBack_small.png"
-			};
-			myMarker = new google.maps.Marker(myMarkerOptions);
-			myInfoWindow = new google.maps.InfoWindow({
-					content: myMarker.getTitle()
-			});
-			// Open the info window.
-			myInfoWindow.open(map,myMarker);
-			// Add click event listener for info window.
-			myMarkerClickListener = google.maps.event.addListener(myMarker,"click",function(){
-					infoWindow.open(map,myMarker);
-			});
-			// Load JSON data of the rest
-			// of the class, send my location
-			// and username.
-			ajaxObj.open("POST","https://secret-about-box.herokuapp.com/sendLocation",true);
-			ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			ajaxObj.onreadystatechange = ajaxCallback;
-			ajaxObj.send("login="+myLogin+"&lat="+myLat+"&lng="+myLng);
-
-*/
