@@ -93,11 +93,10 @@ function addUserMarker(LatLngObj)
 		myInfoWindow.open(map,myMarker);		
 	});
 	// Center the map on the user's marker.
-	console.log(myMarker.getPosition());
-	console.log(map.getCenter());
 	map.setCenter(myMarker.getPosition());
-	console.log(map.getCenter());
 	map.panTo(map.getCenter());
+
+	// END OF FUNCTION CALL TREE //
 }
 
 // Function to add classmate's marker
