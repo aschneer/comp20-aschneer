@@ -89,7 +89,7 @@ function addClassMarkers(classDataArray)
 				title: classDataArray[i].login,
 				position: currDataLoc,
 				visible: true,
-				icon: "../assets/rickles_noBack_small.png"
+				icon: "./assets/rickles_noBack_small.png"
 		};
 		// Create a marker for the current classmate.
 		classMarkers[i] = new google.maps.Marker(markerOptions);
@@ -134,7 +134,7 @@ function addUserMarker(LatLngObj)
 		title: myInfo.login,
 		position: LatLngObj,
 		visible: true,
-		icon: "../assets/rickles_noBack_small.png"
+		icon: "./assets/rickles_noBack_small.png"
 	};
 	// Create user's marker object and
 	// update global "myMarker"
