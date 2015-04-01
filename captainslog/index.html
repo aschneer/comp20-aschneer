@@ -4,9 +4,40 @@
 
 <head>
 	<title>Captain's Log</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+	</script>
 	<script>
-	  // Most of your work will be done here...
+		const KEY_ENTER = 13;
+		var captainsLog = "";
+		$(document).ready(function(){
+			if(typeof(Storage) !== "undefined")
+			{
+				console.log("Local Storage Available");
+				// Load in log from local storage.
+				captainsLog = localStorage.getItem("data");
+				$("#log").html(captainsLog);
+			}
+			else
+			{
+				// Local storage not supported.
+			}
+			// Enter key release event.
+			$("#msg").keyup(function(event){
+				console.log("Key Up");
+				if(event.which == KEY_ENTER)
+				{
+					console.log("Enter");
+					// Prepend new data to log.
+					$("#log").prepend("<p>" + $("#msg").attr("value") + "</p>");
+					// Clear input box.
+					$("#msg").attr("value","");
+					// Update local storage.
+					captainsLog = $("#log").html();
+					console.log(captainsLog);
+					localStorage.setItem("data",captainsLog);
+				}
+			});
+		});
 	</script>
 </head>
 
@@ -15,4 +46,5 @@
 	<h3>New entry: <input type="text" id="msg" name="msg" size="30" /></h3>
 	<div id="log"></div>
 </body>
+
 </html>
