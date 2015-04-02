@@ -4,23 +4,13 @@
 
 <head>
 	<title>Captain's Log</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
-	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script>
-
-
-
-//	COMMENT THIS OUT!!!
-		localStorage.clear();
-
-
-
 		const KEY_ENTER = 13;
 		var captainsLog = "";
 		$(document).ready(function(){
 			if(typeof(Storage) !== "undefined")
 			{
-				console.log("Local Storage Available");
 				// Load in log from local storage.
 				captainsLog = localStorage.getItem("data");
 				$("div#log").html(captainsLog);
@@ -31,23 +21,17 @@
 			}
 			// Enter key release event.
 			$("input#msg").keyup(function(event){
-				console.log("Key Up");
 				if(event.which == KEY_ENTER)
 				{
 					var inputVal = $("input#msg").val();
 					var timeStamp = new Date($.now());
 					timeStamp = timeStamp.toUTCString();
-					console.log(timeStamp);
-					console.log("Enter");
-					console.log(inputVal);
 					// Prepend new data to log.
 					if(inputVal !== "")
 					{
-						console.log("Good input");
 						$("div#log").prepend("<p>" + timeStamp + " - " + inputVal + "</p>");
 						// Update local storage.
 						captainsLog = $("div#log").html();
-						console.log(captainsLog);
 						localStorage.setItem("data",captainsLog);
 					}
 				}
@@ -61,5 +45,4 @@
 	<h3>New entry: <input type="text" id="msg" name="msg" size="30" /></h3>
 	<div id="log"></div>
 </body>
-
 </html>
