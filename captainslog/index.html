@@ -35,13 +35,16 @@
 				if(event.which == KEY_ENTER)
 				{
 					var inputVal = $("input#msg").val();
+					var timeStamp = new Date($.now());
+					timeStamp = timeStamp.toUTCString();
+					console.log(timeStamp);
 					console.log("Enter");
 					console.log(inputVal);
 					// Prepend new data to log.
 					if(inputVal !== "")
 					{
 						console.log("Good input");
-						$("div#log").prepend("<p>" + inputVal + "</p>");
+						$("div#log").prepend("<p>" + timeStamp + " - " + inputVal + "</p>");
 						// Update local storage.
 						captainsLog = $("div#log").html();
 						console.log(captainsLog);
