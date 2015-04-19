@@ -1,6 +1,6 @@
 // Global Variables:
 var myInfo = {
-	login: "RobertDeNiro",
+	login: "KelleyAmmerman",
 	lat: 0,
 	lng: 0,
 };
@@ -171,8 +171,8 @@ function addClassToMap()
 	// Load JSON data of the rest
 	// of the class, send my location
 	// and username.
-//	ajaxObj.open("POST","https://secret-about-box.herokuapp.com/sendLocation",true);
-	ajaxObj.open("POST","https://comp20ass03mapserver.herokuapp.com/sendLocation",true);
+	ajaxObj.open("POST","https://secret-about-box.herokuapp.com/sendLocation",true);
+//	ajaxObj.open("POST","https://comp20ass03mapserver.herokuapp.com/sendLocation",true);
 	ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	ajaxObj.onreadystatechange = ajaxCallback;
 	ajaxObj.send("login="+myInfo.login+"&lat="+myInfo.lat+"&lng="+myInfo.lng);
