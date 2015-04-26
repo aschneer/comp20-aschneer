@@ -50,4 +50,5 @@ li.lev2 p
 li.lev2 p:first-child
 {
 	font-style: italic;
+	text-decoration: underline;
 }

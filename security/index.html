@@ -63,42 +63,58 @@
 							<p>Issue</p>
 							<br>
 							<p>
-								description
+								Non-float values accepted
+								for latitude and longitude.
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Location</p>
 							<br>
 							<p>
-								description
+								/sendLocation
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Severity</p>
 							<br>
 							<p>
-								description
+								Mild
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Description</p>
 							<br>
 							<p>
-								description
+								POST requests to /sendLocation
+								are not validated for proper
+								data types.  Non-numbers can
+								be input for lat and lng values
+								and they are shown in the log
+								as "NaN".  In the database,
+								they are stored as "null".
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Proof of Vulnerability</p>
 							<br>
 							<p>
-								description
+								<img alt="Proof Issue 1" src="./issue_01_01.png"/>
+								<img alt="Proof Issue 1" src="./issue_01_02.png"/>
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Resolution</p>
 							<br>
 							<p>
-								description
+								Use a validation library to check
+								user input to make sure it is of
+								the expected data type.  A great
+								library for this is Chriso's
+								validator.js, which can be found
+								<a href="https://github.com/chriso/validator.js">here</a>.
+								The isFloat() function can be used
+								to check if a piece of data is
+								a floating point number.
 							</p>
 						</li>
 					</ol>
@@ -111,42 +127,52 @@
 							<p>Issue</p>
 							<br>
 							<p>
-								description
+								Script injection.
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Location</p>
 							<br>
 							<p>
-								description
+								/sendLocation
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Severity</p>
 							<br>
 							<p>
-								description
+								Serious
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Description</p>
 							<br>
 							<p>
-								description
+								The site is vulnerable to script
+								injection (XSS) from POST requests.
+								When script tags with javascript
+								code are sent to the server as
+								the login name, the code runs on
+								the page when the HTML is rendered.
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Proof of Vulnerability</p>
 							<br>
 							<p>
-								description
+								<img alt="Proof Issue 2" src="./issue_02_01.png"/>
+								<img alt="Proof Issue 2" src="./issue_02_02.png"/>
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Resolution</p>
 							<br>
 							<p>
-								description
+								Search all POST request content
+								for "<" and ">" symbols and
+								remove them.  This way, no HTML
+								tags could ever be rendered on
+								the page from an outside source.
 							</p>
 						</li>
 					</ol>
@@ -159,42 +185,54 @@
 							<p>Issue</p>
 							<br>
 							<p>
-								description
+								Style injection.
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Location</p>
 							<br>
 							<p>
-								description
+								/sendLocation
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Severity</p>
 							<br>
 							<p>
-								description
+								Serious
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Description</p>
 							<br>
 							<p>
-								description
+								The site is vulnerable to style
+								injection from POST requests.
+								When style tags with CSS
+								code are sent to the server as
+								the login name, the code runs on
+								the page when the HTML is rendered.
+								This opens the site up to clients
+								changing the styles and layout.
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Proof of Vulnerability</p>
 							<br>
 							<p>
-								description
+								<img alt="Proof Issue 3" src="./issue_03_01.png"/>
+								<img alt="Proof Issue 3" src="./issue_03_02.png"/>
 							</p>
 						</li>
 						<li class="lev2">
 							<p>Resolution</p>
 							<br>
 							<p>
-								description
+								Search all POST request content
+								for "<" and ">" symbols and
+								remove them.  This way, no HTML
+								tags could ever be rendered on
+								the page from an outside source.
 							</p>
 						</li>
 					</ol>
