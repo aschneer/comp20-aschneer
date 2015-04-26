@@ -22,7 +22,7 @@
 	<div class="section" id="introduction">
 		<h3>Introduction:</h3>
 		<p>
-			This product is a web server which
+			This product is a web server that
 			serves the geographical locations
 			of its clients.  Clients are able
 			to communicate with the server via
@@ -41,15 +41,116 @@
 			consultant to document and resolve
 			the security and privacy issues in
 			a classmate's web server.
+			<br><br>
+			I have defined "Low"
+			severity vulnerabilities as being
+			non-detrimental, bad practice, or
+			causing reduced functionality
+			without compromising the security
+			or privacy of the site.  "Medium"
+			severity means either the client
+			or server side is vulnerable, but
+			not both.  "High" severity means
+			both the client and server
+			components are at risk.
 		</p>
 	</div>
 	<div class="section" id="methodology">
 		<h3>Methodology:</h3>
-		<p>hello world</p>
+		<p>
+			The basic strategy for finding
+			client-side vulnerabilities was
+			to try cross site scripting (XSS)
+			at every entry point into the
+			site that was available.  These
+			entry points included both the
+			POST route to /sendLocation and
+			the GET route to /location.json.
+			Various HTML tags were inserted into
+			these two places and observed the
+			results.
+			<br><br>
+			Crashing the server was also attempted by
+			overwhelming the database, with no
+			success.  A linux bash script was used
+			to send many, large POST requests to
+			/sendLocation with different login names
+			to try and fill up the database.
+			It was found that even when POST requests
+			were sent with the
+			longest text string that cURL would
+			accept for the login name, the database
+			still functioned.  In addition, even
+			after sending 100 different POST
+			requests with slightly different login
+			names using the bash script, the site
+			still functioned properly.  Below is the
+			bash script that was used.  With more
+			time, the number of POSTs could be increased
+			to 500 or 1000 to try and crash the database,
+			but it does not look like that would
+			be very easy.  Also, at a certain point
+			cURL would refuse to run when the login
+			string became too long.
+			<br><br>
+			<img alt="Bash Script" src="./methodology_01.png"/>
+			<br><br>
+			The tools that were used include cURL (UNIX)
+			and Firefox web browser, particularly
+			the devloper tools such as the HTML
+			element inspector and the
+			javascript console.
+		</p>
 	</div>
 	<div class="section" id="abstract">
 		<h3>Abstract of Findings:</h3>
-		<p>hello world</p>
+		<p>
+			This report outlines the security
+			vulnerabilities that were found
+			at <a href="https://protected-meadow-7856.herokuapp.com/">https://protected-meadow-7856.herokuapp.com/</a>.
+			Several cross-site scripting
+			threats were found, as well as
+			a minor data type malfunction.
+			The datatype malfunction allowed
+			non-numeric values to be stored
+			and rendered as latitude and
+			longitude coordinates.  Although
+			not detrimental in terms of
+			security, this flaw limited the
+			functionality of the site.
+			More importantly, the site was found
+			to be susceptible to both script
+			and style injection into the
+			/sendLocation POST and
+			/location.json GET routes.
+			These issues opened the site up
+			to almost any possible
+			malicious code execution or
+			style tampering on the client
+			side.  In lay terms, this means
+			that an unauthorized user could
+			completely change the appearance
+			and content of the site by simply
+			inserting key phrases into the
+			areas of the site that are designed
+			to accept user input.  Such a user
+			could also plant viruses which could
+			leak information about other users
+			or their computers.
+			Solutions to these problems
+			include verifying the type of
+			data input to the site, as well
+			as either removing or replacing
+			all "<" and ">" characters with
+			their corresponding HTML
+			character entities so that code
+			from outside sources would not
+			be run on the site.  The cost
+			of implementing these changes
+			would be very low, so it is
+			highly recommended that they be
+			done immediately.
+		</p>
 	</div>
 	<div class="section" id="issues">
 		<h3>Issues Found:</h3>
@@ -63,7 +164,7 @@
 							<p>Issue</p>
 							<br>
 							<p>
-								Non-float values accepted
+								Non-float values were accepted
 								for latitude and longitude.
 							</p>
 						</li>
@@ -78,7 +179,18 @@
 							<p>Severity</p>
 							<br>
 							<p>
-								Mild
+								Low
+								<br><br>
+								Although this is a significant
+								issue in terms of functionality,
+								it is not a security threat.
+								The fact that the site displays
+								"NaN" for some of its lat/lng
+								data does not make it vulnerable
+								to malicious intentions.  It
+								simply means that the site does
+								not function as well as it could
+								for its intended purpose.
 							</p>
 						</li>
 						<li class="lev2">
@@ -92,6 +204,22 @@
 								and they are shown in the log
 								as "NaN".  In the database,
 								they are stored as "null".
+								This issue was found by sending
+								non-numeric input as a POST
+								to /sendLocation.  It was
+								observed
+								that the data was displayed as
+								"NaN" on the log page.  It was
+								determined that the data was
+								stored as "null" in the database
+								by sending "?login=[name]" as
+								a GET request to /location.json.
+								The database entry was then
+								returned.  This same
+								database entry
+								was also returned upon
+								successfully completing the POST
+								request.
 							</p>
 						</li>
 						<li class="lev2">
@@ -141,7 +269,21 @@
 							<p>Severity</p>
 							<br>
 							<p>
-								Serious
+								Medium
+								<br><br>
+								This issue is very broad
+								and opens up the site to
+								the possibility of a client
+								executing virtually any
+								malicious or non-malicious
+								code on the client side of
+								the site.  The good news is
+								that this threat does not
+								compromise the server as
+								the injected script will
+								only run when it is
+								rendered on the client's
+								HTML page.
 							</p>
 						</li>
 						<li class="lev2">
@@ -153,7 +295,26 @@
 								When script tags with javascript
 								code are sent to the server as
 								the login name, the code runs on
-								the page when the HTML is rendered.
+								the page when the HTML is rendered.  This threat was found
+								by trying to inject empty
+								HTML script tags into
+								the "login" field of
+								the database and then observing
+								the results.  It was found that
+								the script tags were being
+								stored in the database (checked the /location.json
+								returned database entry) but
+								not printed to the page.  The
+								HTML element
+								inspector in Firefox then showed
+								that the script tags were in
+								fact making their way into the
+								HTML DOM.  Once it was known that
+								the script was being injected
+								successfully, an alert()
+								function was sent in the
+								script tags
+								to demonstrate the threat.
 							</p>
 						</li>
 						<li class="lev2">
@@ -173,6 +334,13 @@
 								remove them.  This way, no HTML
 								tags could ever be rendered on
 								the page from an outside source.
+								Alternatively, all "<" and ">"
+								brackets could be replaced with
+								their HTML character entities.
+								This way, when the page is
+								loaded, the characters will
+								appear on the page as desired
+								without executing the script.
 							</p>
 						</li>
 					</ol>
@@ -199,7 +367,18 @@
 							<p>Severity</p>
 							<br>
 							<p>
-								Serious
+								Medium
+								<br><br>
+								This issue is very broad
+								and opens up the site to
+								the possibility of a client
+								executing virtually any
+								malicious or non-malicious
+								page styling.  This opens
+								the door for non-authorized
+								clients to completely change
+								the appearance and layout
+								of the web page.
 							</p>
 						</li>
 						<li class="lev2">
@@ -214,6 +393,20 @@
 								the page when the HTML is rendered.
 								This opens the site up to clients
 								changing the styles and layout.
+								This was found the same way
+								Issue 2 was found.
+								"&ltstyle&gt&lt/style&gt"
+								was sent
+								to the login
+								field of the POST request to
+								/sendLocation.  Once it was
+								verified that
+								the injected styles were
+								in fact being
+								rendered on the page,
+								the background color of
+								the page was changed to
+								demonstrate the threat.
 							</p>
 						</li>
 						<li class="lev2">
@@ -233,6 +426,201 @@
 								remove them.  This way, no HTML
 								tags could ever be rendered on
 								the page from an outside source.
+								Alternatively, all "<" and ">"
+								brackets could be replaced with
+								their HTML character entities.
+								This way, when the page is
+								loaded, the characters will
+								appear on the page as desired
+								without executing the HTML tags.
+							</p>
+						</li>
+					</ol>
+				</li>
+				<li class="lev1">
+					<p>Issue 4</p>
+					<br>
+					<ol>
+						<li class="lev2">
+							<p>Issue</p>
+							<br>
+							<p>
+								Script injection.
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Location</p>
+							<br>
+							<p>
+								/location.json
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Severity</p>
+							<br>
+							<p>
+								Medium
+								<br><br>
+								This issue is very broad
+								and opens up the site to
+								the possibility of a client
+								executing virtually any
+								malicious or non-malicious
+								code from the outside.
+								However, only the client
+								side of the site is
+								vulnerable, so the severity
+								is medium.
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Description</p>
+							<br>
+							<p>
+								The site allows HTML
+								script tags to be inserted
+								as URL parameters for
+								GET requests.  This means
+								that if the corresponding
+								script tags had previously
+								been saved to the database,
+								they will execute when the
+								API returns the database
+								entry.  This opens the site
+								up to clients executing
+								virtually any client-side
+								code on the site from
+								the outside without
+								authorization.  This
+								threat was found
+								by first saving the
+								script tags to the database
+								by POSTing to /sendLocation
+								and then calling that database
+								entry using a GET to
+								/location.json.
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Proof of Vulnerability</p>
+							<br>
+							<p>
+								<img alt="Proof Issue 4" src="./issue_04_01.png"/>
+								<img alt="Proof Issue 4" src="./issue_04_02.png"/>
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Resolution</p>
+							<br>
+							<p>
+								Search all GET request queries
+								for "<" and ">" symbols and
+								remove them.  This way, no HTML
+								tags could ever be rendered on
+								the page from an outside source.
+								Alternatively, all "<" and ">"
+								brackets could be replaced with
+								their HTML character entities.
+								This way, when the page is
+								loaded, the characters will
+								appear on the page as desired
+								without executing the script.
+							</p>
+						</li>
+					</ol>
+				</li>
+				<li class="lev1">
+					<p>Issue 5</p>
+					<br>
+					<ol>
+						<li class="lev2">
+							<p>Issue</p>
+							<br>
+							<p>
+								Style injection.
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Location</p>
+							<br>
+							<p>
+								/location.json
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Severity</p>
+							<br>
+							<p>
+								Medium
+								<br><br>
+								This issue is very broad
+								and opens up the site to
+								the possibility of a client
+								executing virtually any
+								style or layout changes from
+								an outside source.  This
+								could potentially kill the
+								functionality of the site
+								because an unauthorized client
+								could completely change the
+								webpage interface.
+								However, only the client
+								side of the site is
+								vulnerable, so the severity
+								is medium.
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Description</p>
+							<br>
+							<p>
+								The site allows HTML
+								style tags to be inserted
+								as URL parameters for
+								GET requests.  This means
+								that if the corresponding
+								style tags had previously
+								been saved to the database,
+								they would execute when the
+								API returns the database
+								entry.  This opens the site
+								up to clients making any
+								styling or layout changes
+								to the site without
+								authorization.  This
+								threat was found
+								by first saving the
+								style tags to the database
+								by POSTing to /sendLocation
+								and then calling that database
+								entry using a GET to
+								/location.json.
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Proof of Vulnerability</p>
+							<br>
+							<p>
+								<img alt="Proof Issue 5" src="./issue_05_01.png"/>
+								<img alt="Proof Issue 5" src="./issue_05_02.png"/>
+							</p>
+						</li>
+						<li class="lev2">
+							<p>Resolution</p>
+							<br>
+							<p>
+								Search all GET request queries
+								for "<" and ">" symbols and
+								remove them.  This way, no HTML
+								tags could ever be rendered on
+								the page from an outside source.
+								Alternatively, all "<" and ">"
+								brackets could be replaced with
+								their HTML character entities.
+								This way, when the page is
+								loaded, the characters would
+								appear on the page as desired
+								without executing the HTML tags.
 							</p>
 						</li>
 					</ol>
@@ -242,7 +630,16 @@
 	</div>
 	<div class="section" id="conclusion">
 		<h3>Conclusion:</h3>
-		<p>hello world</p>
+		<p>
+			The security flaws discovered in
+			this analysis were very basic.
+			Fixing them involves adding/changing
+			only a few lines of code on the
+			server side of the site, and so the
+			cost is extremely low.  It is highly
+			recommended that these changes be
+			made immediately.
+		</p>
 	</div>
 </body>
 
